@@ -1,0 +1,11 @@
+{
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.typeCheckingMode": "basic",
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true
+  },
+  "chat.promptFiles": true,
+  "chat.useAgentsMdFile": true,
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true
+}

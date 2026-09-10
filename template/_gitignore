@@ -1,0 +1,17 @@
+# --- ai-python-bootstrap ---
+# Ambiente virtual local
+.venv/
+
+# Rutas absolutas de ESTA maquina. Nunca se versiona.
+.ai/env.local.json
+.ai/packages.backup.txt
+.ai/*.tmp
+.vscode/settings.json.bak
+
+# .ai/env.json SI se versiona: es portable y no contiene rutas absolutas.
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+# --- fin ai-python-bootstrap ---

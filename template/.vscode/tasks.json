@@ -1,0 +1,100 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Python: configurar ambiente (uv)",
+      "type": "shell",
+      "command": "uv",
+      "args": ["run", "--script", "${workspaceFolder}/.ai/setup_env.py"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "Python: sincronizar ambiente en este computador",
+      "type": "shell",
+      "command": "uv",
+      "args": ["run", "--script", "${workspaceFolder}/.ai/setup_env.py", "--sync"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "Python: ver configuracion actual",
+      "type": "shell",
+      "command": "uv",
+      "args": ["run", "--script", "${workspaceFolder}/.ai/setup_env.py", "--show"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "Python: cambiar de ambiente",
+      "type": "shell",
+      "command": "uv",
+      "args": ["run", "--script", "${workspaceFolder}/.ai/setup_env.py", "--change"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "Python: cambiar version de Python del ambiente",
+      "type": "shell",
+      "command": "uv",
+      "args": [
+        "run",
+        "--script",
+        "${workspaceFolder}/.ai/setup_env.py",
+        "--switch-python",
+        "${input:pythonVersion}"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "Python: fijar version por defecto de este computador",
+      "type": "shell",
+      "command": "uv",
+      "args": [
+        "run",
+        "--script",
+        "${workspaceFolder}/.ai/setup_env.py",
+        "--set-default-python",
+        "${input:pythonVersion}"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "Python: cambiar carpeta de ambientes de este computador",
+      "type": "shell",
+      "command": "uv",
+      "args": [
+        "run",
+        "--script",
+        "${workspaceFolder}/.ai/setup_env.py",
+        "--set-envs-root",
+        "${input:envsRoot}"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "envsRoot",
+      "type": "promptString",
+      "description": "Ruta de la carpeta de ambientes virtuales en este computador",
+      "default": "C:/PythonFiles/envs"
+    },
+    {
+      "id": "pythonVersion",
+      "type": "promptString",
+      "description": "Version de Python: una serie (3.12) o una version exacta (3.12.8)",
+      "default": "3.12"
+    }
+  ]
+}

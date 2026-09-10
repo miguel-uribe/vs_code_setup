@@ -1,0 +1,9 @@
+# Este repo es la plantilla, no un proyecto Python.
+__pycache__/
+*.py[cod]
+.venv/
+.ruff_cache/
+.pytest_cache/
+
+# Salidas de pruebas manuales del instalador
+/sandbox/

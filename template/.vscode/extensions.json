@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.vscode-pylance",
+    "charliermarsh.ruff",
+    "GitHub.copilot",
+    "GitHub.copilot-chat",
+    "anthropic.claude-code",
+    "openai.chatgpt",
+    "Google.geminicodeassist"
+  ]
+}
