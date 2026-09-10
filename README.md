@@ -113,6 +113,18 @@ uv --version
 This walks through the whole lifecycle, from a bare machine to a project shared
 with a colleague.
 
+> **Which copy of the script am I running?** There are two, and mixing them up
+> is the most common early mistake.
+>
+> - `template/.ai/setup_env.py` lives in **this repository**. It is the master
+>   copy that gets distributed.
+> - `.ai/setup_env.py` lives in a **project you have installed into**. It only
+>   exists after Step 2.
+>
+> Every command below that starts with `.ai/setup_env.py` is meant to be run
+> from inside a configured project. If you are still sitting in this repository
+> and see `[Errno 2] No such file or directory`, that is why.
+
 ### Step 1: set up the machine, once
 
 Tell the tool where shared environments should live on this computer:
@@ -121,9 +133,18 @@ Tell the tool where shared environments should live on this computer:
 uv run --script .ai/setup_env.py --set-envs-root "D:/envs"
 ```
 
+This is a **machine-level** setting. It writes to your user configuration and
+exits without touching any project, so you can run it from any configured
+project, or straight from this repository before you have installed anywhere:
+
+```bash
+uv run --script template/.ai/setup_env.py --set-envs-root "D:/envs"
+```
+
 You only do this once per machine, and you can skip it entirely. If you never
 run it, the script asks the first time it needs a shared environment and saves
-your answer.
+your answer. In that case, jump to Step 2 and come back if you want to change
+the folder later.
 
 The environments folder is resolved in this order, most specific first:
 
@@ -133,11 +154,19 @@ The environments folder is resolved in this order, most specific first:
 4. A prompt, whose answer is then saved
 5. A built-in default: `C:\PythonFiles\envs` on Windows, `~/.virtualenvs` elsewhere
 
-You can also pin the default Python version for this machine:
+You can also pin the default Python version for this machine. The same note
+about which copy to run applies:
 
 ```bash
 uv run --script .ai/setup_env.py --set-default-python 3.13
 ```
+
+Both settings land in one file, which you can inspect or delete at any time:
+
+| Platform | Location |
+|---|---|
+| Windows | `%APPDATA%\ai-python-bootstrap\config.json` |
+| macOS and Linux | `~/.config/ai-python-bootstrap/config.json` |
 
 ### Step 2: install the template into a project
 
@@ -554,6 +583,19 @@ Run as `uv run --script .ai/setup_env.py <flags>`.
 ---
 
 ## Troubleshooting
+
+**`can't open file '...\.ai\setup_env.py': [Errno 2] No such file or
+directory`.** You are running from a folder that has no `.ai/` in it, most
+often this repository itself. In this repository the script lives at
+`template/.ai/setup_env.py`. A project only gets its own `.ai/setup_env.py`
+after you install the template into it, as described in Step 2.
+
+For the two machine-level flags, `--set-envs-root` and `--set-default-python`,
+you can just point at the template copy, since neither one touches a project:
+
+```bash
+uv run --script template/.ai/setup_env.py --set-envs-root "C:/PythonFiles/envs"
+```
 
 **The menu fails with "No hay terminal interactiva".** You are running without a
 TTY, which happens in CI and inside some agent terminals. Pass `--mode`
