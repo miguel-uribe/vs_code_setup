@@ -113,53 +113,45 @@ uv --version
 This walks through the whole lifecycle, from a bare machine to a project shared
 with a colleague.
 
-> **Which copy of the script am I running?** There are two, and mixing them up
-> is the most common early mistake.
+> **Where do I run each command?** There is one rule, and it follows the scope
+> of what you are changing.
 >
-> - `template/.ai/setup_env.py` lives in **this repository**. It is the master
->   copy that gets distributed.
-> - `.ai/setup_env.py` lives in a **project you have installed into**. It only
->   exists after Step 2.
+> | Scope | Run from | Script path |
+> |---|---|---|
+> | Machine settings: the environments folder, the default Python version | This repository | `template/.ai/setup_env.py` |
+> | Everything else: choosing, syncing or switching a project's environment | The project itself | `.ai/setup_env.py` |
 >
-> Every command below that starts with `.ai/setup_env.py` is meant to be run
-> from inside a configured project. If you are still sitting in this repository
-> and see `[Errno 2] No such file or directory`, that is why.
+> Step 1 is the machine half. Steps 2 through 6 are the project half, and by
+> then the project has its own copy of the script, installed in Step 2.
+>
+> If you see `[Errno 2] No such file or directory`, you are in the wrong half.
 
 ### Step 1: set up the machine, once
 
+**Run this from the folder where you cloned this repository.** Machine-level
+settings belong here, not in a project.
+
 Tell the tool where shared environments should live on this computer:
-
-```bash
-uv run --script .ai/setup_env.py --set-envs-root "D:/envs"
-```
-
-This is a **machine-level** setting. It writes to your user configuration and
-exits without touching any project, so you can run it from any configured
-project, or straight from this repository before you have installed anywhere:
 
 ```bash
 uv run --script template/.ai/setup_env.py --set-envs-root "D:/envs"
 ```
 
-You only do this once per machine, and you can skip it entirely. If you never
-run it, the script asks the first time it needs a shared environment and saves
-your answer. In that case, jump to Step 2 and come back if you want to change
-the folder later.
-
-The environments folder is resolved in this order, most specific first:
-
-1. `--envs-root` passed on the command line, for one run only
-2. The `AI_ENVS_ROOT` environment variable
-3. The saved machine configuration
-4. A prompt, whose answer is then saved
-5. A built-in default: `C:\PythonFiles\envs` on Windows, `~/.virtualenvs` elsewhere
-
-You can also pin the default Python version for this machine. The same note
-about which copy to run applies:
+You can also pin the default Python version for this machine:
 
 ```bash
-uv run --script .ai/setup_env.py --set-default-python 3.13
+uv run --script template/.ai/setup_env.py --set-default-python 3.13
 ```
+
+Both flags write to your user configuration and exit immediately. They never
+read or touch a project, which is exactly why they belong at the repository
+level: the answer applies to the whole computer, so tying it to one project
+would be misleading.
+
+You only do this once per machine, and you can skip it entirely. If you never
+run it, the script asks the first time it needs a shared environment and saves
+your answer. In that case, go straight to Step 2 and come back here whenever
+you want to change the folder or the default version.
 
 Both settings land in one file, which you can inspect or delete at any time:
 
@@ -167,6 +159,15 @@ Both settings land in one file, which you can inspect or delete at any time:
 |---|---|
 | Windows | `%APPDATA%\ai-python-bootstrap\config.json` |
 | macOS and Linux | `~/.config/ai-python-bootstrap/config.json` |
+
+For reference, the environments folder is resolved in this order, most specific
+first. What you saved here is item 3:
+
+1. `--envs-root` passed on the command line, for one run only
+2. The `AI_ENVS_ROOT` environment variable
+3. The saved machine configuration
+4. A prompt, whose answer is then saved
+5. A built-in default: `C:\PythonFiles\envs` on Windows, `~/.virtualenvs` elsewhere
 
 ### Step 2: install the template into a project
 
@@ -317,8 +318,13 @@ one of the installed tasks. Their labels appear in Spanish:
 | `Python: ver configuracion actual` | Runs `--show` |
 | `Python: cambiar de ambiente` | Runs `--change` |
 | `Python: cambiar version de Python del ambiente` | Prompts for a version, runs `--switch-python` |
-| `Python: fijar version por defecto de este computador` | Runs `--set-default-python` |
-| `Python: cambiar carpeta de ambientes de este computador` | Runs `--set-envs-root` |
+
+The installed `tasks.json` also carries two tasks that change machine settings,
+`Python: fijar version por defecto de este computador` and
+`Python: cambiar carpeta de ambientes de este computador`. Prefer the
+repository-level commands from Step 1 for those. A machine setting changed from
+inside one project is easy to forget you changed, and it silently affects every
+other project on the computer.
 
 On Windows you can also call `.ai\setup-env.ps1`, and on macOS or Linux
 `.ai/setup-env.sh`, with exactly the same arguments. Both check that uv is
@@ -557,9 +563,9 @@ rather than causing your settings to be discarded.
 | `--force` | Overwrite existing files. Use with care. |
 | `--setup` | Launch the environment wizard when the install finishes. |
 
-### Environment script
+### Environment script, project flags
 
-Run as `uv run --script .ai/setup_env.py <flags>`.
+Run from the project, as `uv run --script .ai/setup_env.py <flags>`.
 
 | Command | Effect |
 |---|---|
@@ -577,6 +583,15 @@ Run as `uv run --script .ai/setup_env.py <flags>`.
 | `--force` | Rebuild even if the environment already exists |
 | `--yes` | Skip the shared-environment confirmation prompt |
 | `--envs-root <path>` | Override the environments folder for this run only |
+
+### Environment script, machine flags
+
+Run from this repository, as
+`uv run --script template/.ai/setup_env.py <flags>`. Both write your user
+configuration and exit without reading any project.
+
+| Command | Effect |
+|---|---|
 | `--set-envs-root <path>` | Save this machine's environments folder, then exit |
 | `--set-default-python <v>` | Save this machine's default Python version, then exit |
 
@@ -590,8 +605,8 @@ often this repository itself. In this repository the script lives at
 `template/.ai/setup_env.py`. A project only gets its own `.ai/setup_env.py`
 after you install the template into it, as described in Step 2.
 
-For the two machine-level flags, `--set-envs-root` and `--set-default-python`,
-you can just point at the template copy, since neither one touches a project:
+The two machine-level flags, `--set-envs-root` and `--set-default-python`, are
+meant to be run from this repository in the first place:
 
 ```bash
 uv run --script template/.ai/setup_env.py --set-envs-root "C:/PythonFiles/envs"
@@ -666,8 +681,10 @@ files themselves; the installer writes it under its real name in the target.
 - Merging `settings.json` **loses the comments** in the original file. The
   output is clean JSON. All values are preserved.
 - The Claude Code hook needs your approval the first time it runs.
-- `--set-envs-root` writes outside the project, into the machine configuration.
-  That is intentional, but worth knowing before running it on a shared machine.
+- `--set-envs-root` and `--set-default-python` write outside the project, into
+  the machine configuration, and affect every project on the computer. That is
+  intentional, and it is why this guide runs them from the repository rather
+  than from a project. Worth knowing before running either on a shared machine.
 - There are no automated tests. Verification has been manual, covering clean
   installs, installs over existing configuration, all four modes, cloning to a
   different environments folder, recovery after deleting an interpreter, every
